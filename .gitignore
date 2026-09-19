@@ -45,3 +45,5 @@ release/
 
 # CodeGraph
 .codegraph/
+
+release/

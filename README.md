@@ -95,10 +95,10 @@ Configurable via **Mod Settings** in the pause or main menu (or in `BepInEx/conf
 ## 🚀 Installation
 
 1. Close Big Walk.
-2. Build or download `BigFireworks.dll`.
-3. Place `BigFireworks.dll` into your game install:
+2. Build or download `BigFirework.dll`.
+3. Place `BigFirework.dll` into your game install:
    ```
-   Big Walk/BepInEx/plugins/BigFireworks/BigFireworks.dll
+   Big Walk/BepInEx/plugins/BigFirework/BigFirework.dll
    ```
 4. Launch Big Walk as Host.
 5. Press <kbd>F10</kbd> to launch your first show!

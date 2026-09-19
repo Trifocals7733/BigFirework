@@ -2,12 +2,12 @@
 
   <PropertyGroup>
     <TargetFramework>net6.0</TargetFramework>
-    <AssemblyName>BigFireworks</AssemblyName>
+    <AssemblyName>BigFirework</AssemblyName>
     <Product>Big Firework</Product>
     <Version>1.0.0</Version>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
-    <RootNamespace>BigFireworks</RootNamespace>
+    <RootNamespace>BigFirework</RootNamespace>
     <Nullable>disable</Nullable>
 
     <!-- Game install: tweak here if it moves -->
@@ -36,7 +36,7 @@
   </ItemGroup>
 
   <Target Name="CopyToPlugins" AfterTargets="Build">
-    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)\BigFireworks" />
+    <Copy SourceFiles="$(TargetPath)" DestinationFolder="$(PluginsDir)\BigFirework" />
   </Target>
 
 </Project>
