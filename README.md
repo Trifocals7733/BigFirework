@@ -5,6 +5,7 @@
 # 🎆 Big Firework
 
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
+[![Latest release](https://img.shields.io/github/v/release/Trifocals7733/BigFirework?style=flat-square&label=latest%20release)](https://github.com/Trifocals7733/BigFirework/releases/latest)
 [![Supported game](https://img.shields.io/badge/Big%20Walk%20%7C%20BepInEx%206-supported-6f42c1?style=flat-square)](https://store.steampowered.com/app/1478500/Big_Walk/)
 
 **Host-synchronized sky firework shows, interactive launcher pads, cinematic night transitions, and authentic flare audio for Big Walk.**
@@ -111,6 +112,6 @@ Configurable via **Mod Settings** in the pause or main menu (or in `BepInEx/conf
 
 ## 💖 Credits
 
-- **M4TR!X GG** — Thumbnail artwork
+- **M4TR!X GG** — Thumbnail artwork and testing
 - **Dexter** — Testing and feedback
 - Developed with BepInEx 6 IL2CPP & Harmony for Big Walk
