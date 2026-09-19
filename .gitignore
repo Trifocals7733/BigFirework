@@ -1,0 +1,47 @@
+# .NET build artifacts
+bin/
+obj/
+out/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+*.user
+*.suo
+*.userosscache
+*.sln.docstates
+.vscode/
+!.vscode/extensions.json
+
+# Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+*.dll
+*.pdb
+!packages/**/*.dll
+
+# NuGet
+*.nupkg
+*.snupkg
+packages/
+.nuget/
+project.lock.json
+project.fragment.lock.json
+artifacts/
+
+# OS noise
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Game-local files (never commit your install into the repo)
+LogOutput.log
+*.cfg
+
+# Release files
+release/
+
+# CodeGraph
+.codegraph/
