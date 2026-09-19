@@ -453,8 +453,7 @@ public class Show : MonoBehaviour
         }
     }
 
-    static readonly List<AudioAsset> _cachedBangAssets = new();
-    static AudioClip _cachedBangClip;
+    static AudioAsset _cachedBangAsset;
 
     static Vector3 GetListenerPosition()
     {
@@ -487,248 +486,26 @@ public class Show : MonoBehaviour
         return null;
     }
 
-
-    static void IngestAssetsFromPoss(ParticleOneShotSound poss)
+    static void DiscoverBangAsset(PeckEffectParticleNetworked e)
     {
-        if (poss == null) return;
-        try
-        {
-            if (poss.Assets != null && poss.Assets.Length > 0)
-            {
-                for (int i = 0; i < poss.Assets.Length; i++)
-                {
-                    var a = poss.Assets[i];
-                    if (a != null && !_cachedBangAssets.Contains(a))
-                    {
-                        _cachedBangAssets.Add(a);
-                        Plugin.Log.LogInfo($"Big Firework: Discovered native flare explosion AudioAsset '{a.name}' from ParticleOneShotSound on {poss.gameObject.name}");
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Plugin.Log.LogWarning($"Error reading ParticleOneShotSound assets: {ex.Message}");
-        }
-    }
-
-    static void ScanResourcesForBangAssets()
-    {
-        if (_cachedBangAssets.Count > 0) return;
-
-        try
-        {
-            var assets = Resources.FindObjectsOfTypeAll<AudioAsset>();
-            if (assets != null && assets.Length > 0)
-            {
-                AudioAsset bestDistant = null;
-                AudioAsset bestExplode = null;
-
-                for (int i = 0; i < assets.Length; i++)
-                {
-                    var a = assets[i];
-                    if (a == null) continue;
-                    var aname = a.name ?? "";
-
-                    bool hasShoot = aname.Contains("shoot", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("launch", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("whoosh", StringComparison.OrdinalIgnoreCase);
-                    if (hasShoot) continue;
-
-                    bool isFlare = aname.Contains("flare", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("rocket", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("firework", StringComparison.OrdinalIgnoreCase);
-
-                    bool isBurst = aname.Contains("burst", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("explode", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("bang", StringComparison.OrdinalIgnoreCase)
-                        || aname.Contains("detonat", StringComparison.OrdinalIgnoreCase);
-
-                    if (isFlare && isBurst)
-                    {
-                        if (aname.Contains("distant", StringComparison.OrdinalIgnoreCase) || aname.Contains("far", StringComparison.OrdinalIgnoreCase))
-                        {
-                            bestDistant = a;
-                            _cachedBangAssets.Add(a);
-                            Plugin.Log.LogInfo($"Big Firework: Discovered distant flare explosion AudioAsset '{aname}' in Resources");
-                        }
-                        else if (!aname.Contains("close", StringComparison.OrdinalIgnoreCase))
-                        {
-                            bestExplode ??= a;
-                            _cachedBangAssets.Add(a);
-                            Plugin.Log.LogInfo($"Big Firework: Discovered flare explosion AudioAsset '{aname}' in Resources");
-                        }
-                        else if (bestExplode == null && bestDistant == null)
-                        {
-                            bestExplode = a;
-                        }
-                    }
-                }
-
-                if (_cachedBangAssets.Count == 0 && bestExplode != null)
-                {
-                    _cachedBangAssets.Add(bestExplode);
-                    Plugin.Log.LogInfo($"Big Firework: Using fallback flare explosion AudioAsset '{bestExplode.name}' in Resources");
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            Plugin.Log.LogWarning($"ScanResourcesForBangAssets error: {ex.Message}");
-        }
-    }
-
-    static void ScanResourcesForBangClips()
-    {
-        if (_cachedBangAssets.Count > 0 || _cachedBangClip != null) return;
-
-        try
-        {
-            var clips = Resources.FindObjectsOfTypeAll<AudioClip>();
-            if (clips != null && clips.Length > 0)
-            {
-                AudioClip bestDistant = null;
-                AudioClip bestAny = null;
-
-                for (int i = 0; i < clips.Length; i++)
-                {
-                    var c = clips[i];
-                    if (c == null) continue;
-                    var cname = c.name ?? "";
-
-                    bool hasShoot = cname.Contains("shoot", StringComparison.OrdinalIgnoreCase)
-                        || cname.Contains("launch", StringComparison.OrdinalIgnoreCase)
-                        || cname.Contains("whoosh", StringComparison.OrdinalIgnoreCase);
-                    if (hasShoot) continue;
-
-                    bool isFlare = cname.Contains("flare", StringComparison.OrdinalIgnoreCase)
-                        || cname.Contains("rocket", StringComparison.OrdinalIgnoreCase)
-                        || cname.Contains("firework", StringComparison.OrdinalIgnoreCase);
-
-                    bool isBurst = cname.Contains("burst", StringComparison.OrdinalIgnoreCase)
-                        || cname.Contains("explode", StringComparison.OrdinalIgnoreCase)
-                        || cname.Contains("bang", StringComparison.OrdinalIgnoreCase);
-
-                    if (isFlare && isBurst)
-                    {
-                        if (cname.Contains("distant", StringComparison.OrdinalIgnoreCase) || cname.Contains("far", StringComparison.OrdinalIgnoreCase))
-                        {
-                            bestDistant = c;
-                            break;
-                        }
-                        if (!cname.Contains("close", StringComparison.OrdinalIgnoreCase) && bestAny == null)
-                        {
-                            bestAny = c;
-                        }
-                    }
-                }
-
-                _cachedBangClip = bestDistant ?? bestAny;
-                if (_cachedBangClip != null)
-                    Plugin.Log.LogInfo($"Big Firework: Using fallback flare BANG clip '{_cachedBangClip.name}' in Resources");
-            }
-        }
-        catch { }
-    }
-
-    static void DiscoverBangAssets(PeckEffectParticleNetworked e)
-    {
-        if (_cachedBangAssets.Count > 0 || _cachedBangClip != null) return;
+        if (_cachedBangAsset != null) return;
 
         var poss = FindParticleOneShotSound(e);
-        if (poss != null)
+        if (poss?.Assets != null && poss.Assets.Length > 0)
         {
-            IngestAssetsFromPoss(poss);
-            if (_cachedBangAssets.Count > 0) return;
-        }
-
-        ScanResourcesForBangAssets();
-        if (_cachedBangAssets.Count > 0) return;
-
-        ScanResourcesForBangClips();
-    }
-
-    static AudioAsset GetBestBangAsset()
-    {
-        if (_cachedBangAssets.Count == 0) return null;
-        for (int i = 0; i < _cachedBangAssets.Count; i++)
-        {
-            var a = _cachedBangAssets[i];
-            if (a != null && !a.name.Contains("close", StringComparison.OrdinalIgnoreCase))
-                return a;
-        }
-        return _cachedBangAssets[0];
-    }
-
-
-    internal static AudioClip TryExtractClip(AudioAsset asset)
-    {
-        if (asset == null) return null;
-        try
-        {
-            var cue = asset.TryCast<SoundCue>();
-            if (cue != null && cue.Clip != null) return cue.Clip;
-
-            var arc = asset.TryCast<AudioRandomContainer>();
-            if (arc != null)
+            for (int i = 0; i < poss.Assets.Length; i++)
             {
-                if (arc.Cues != null && arc.Cues.Length > 0)
+                var a = poss.Assets[i];
+                if (a != null && !a.name.Contains("close", StringComparison.OrdinalIgnoreCase))
                 {
-                    int idx = UnityEngine.Random.Range(0, arc.Cues.Length);
-                    var c = arc.Cues[idx];
-                    if (c != null && c.Clip != null) return c.Clip;
-
-                    for (int i = 0; i < arc.Cues.Length; i++)
-                    {
-                        c = arc.Cues[i];
-                        if (c != null && c.Clip != null) return c.Clip;
-                    }
-                }
-                var randomCue = arc.GetCue();
-                if (randomCue != null && randomCue.Clip != null) return randomCue.Clip;
-            }
-
-            var alc = asset.TryCast<AudioLayerContainer>();
-            if (alc != null)
-            {
-                if (alc.Heads != null)
-                {
-                    for (int i = 0; i < alc.Heads.Length; i++)
-                    {
-                        var c = TryExtractClip(alc.Heads[i]?.Asset);
-                        if (c != null) return c;
-                    }
-                }
-                if (alc.Loops != null)
-                {
-                    for (int i = 0; i < alc.Loops.Length; i++)
-                    {
-                        var c = TryExtractClip(alc.Loops[i]?.Asset);
-                        if (c != null) return c;
-                    }
-                }
-                if (alc.Tails != null)
-                {
-                    for (int i = 0; i < alc.Tails.Length; i++)
-                    {
-                        var c = TryExtractClip(alc.Tails[i]?.Asset);
-                        if (c != null) return c;
-                    }
+                    _cachedBangAsset = a;
+                    Plugin.Log.LogInfo($"Big Firework: Discovered native flare explosion AudioAsset '{a.name}' from {poss.gameObject.name}");
+                    return;
                 }
             }
-
-            var sb = asset.TryCast<SoundBank>();
-            if (sb != null && sb.AllClips != null)
-            {
-                foreach (var c in sb.AllClips)
-                    if (c != null) return c;
-            }
-
-            var fallbackCue = asset.TryGetCue();
-            if (fallbackCue != null && fallbackCue.Clip != null) return fallbackCue.Clip;
+            _cachedBangAsset = poss.Assets[0];
+            Plugin.Log.LogInfo($"Big Firework: Discovered native flare explosion AudioAsset '{_cachedBangAsset.name}' from {poss.gameObject.name}");
         }
-        catch { }
-        return null;
     }
 
     /// <summary>Schedules an authentic flare BANG sound to detonate in the air at the apex of the rocket's flight.</summary>
@@ -736,10 +513,9 @@ public class Show : MonoBehaviour
     {
         if (FlareSounds == null || !FlareSounds.Value) return;
 
-        // One-time discovery on the first burst of the session
-        if (_cachedBangAssets.Count == 0 && _cachedBangClip == null)
+        if (_cachedBangAsset == null)
         {
-            DiscoverBangAssets(e);
+            DiscoverBangAsset(e);
         }
 
         try
@@ -748,22 +524,18 @@ public class Show : MonoBehaviour
             const float flightTime = 1.75f;
             const float flightSpeed = 24f;
 
-
-
             // Flare travels along the launch forward axis into the sky
             Vector3 airPos = pos + (rot * Vector3.forward) * (flightSpeed * flightTime * 0.85f);
 
-            // 4. Acoustic travel time: sound travels at 343 m/s (speed of sound)
+            // Acoustic travel time: sound travels at 343 m/s (speed of sound)
             Vector3 listenerPos = GetListenerPosition();
             float distance = Vector3.Distance(listenerPos, airPos);
             float acousticDelay = distance / 343f;
 
             // Explosion happens at Time.time + flightTime; sound arrives after acoustic travel delay
-            float soundArrivalTime = Time.time + flightTime + acousticDelay;
-
             _pendingBangs.Add(new PendingAirBang
             {
-                PlayTime = soundArrivalTime,
+                PlayTime = Time.time + flightTime + acousticDelay,
                 Position = airPos
             });
         }
@@ -777,52 +549,16 @@ public class Show : MonoBehaviour
     /// <summary>Plays the authentic flare explosion bang in the air at the burst coordinates.</summary>
     internal static void PlayAirBang(Vector3 airPos)
     {
-        if (FlareSounds == null || !FlareSounds.Value) return;
+        if (FlareSounds == null || !FlareSounds.Value || _cachedBangAsset == null) return;
 
         try
         {
-            var asset = GetBestBangAsset();
-            if (asset != null)
-            {
-                // Play via Big Walk's native AudioSystem engine (3D spatial, occlusion, reverb, RTPC curves)
-                AudioPlayHelper.CreateEventAndPlay(asset, airPos, null, null, null, true, -1f, null, null, false);
-                return;
-            }
-
-            // Fallback to AudioClip with full 3D spatialization
-            AudioClip clip = _cachedBangClip;
-            if (clip != null)
-            {
-                Play3DSound(clip, airPos, 1.0f);
-            }
+            AudioPlayHelper.CreateEventAndPlay(_cachedBangAsset, airPos, null, null, null, true, -1f, null, null, false);
         }
         catch (Exception ex)
         {
             if (Diagnostics != null && Diagnostics.Value)
                 Plugin.Log.LogWarning($"PlayAirBang error: {ex.Message}");
-        }
-    }
-
-    internal static void Play3DSound(AudioClip clip, Vector3 pos, float volume = 1.0f)
-    {
-        if (clip == null) return;
-        try
-        {
-            var go = new GameObject("FireworkFlareBangAudio");
-            go.transform.position = pos;
-            var src = go.AddComponent<AudioSource>();
-            src.clip = clip;
-            src.volume = volume;
-            src.spatialBlend = 1.0f; // 100% 3D spatial
-            src.minDistance = 30f;
-            src.maxDistance = 1000f;
-            src.rolloffMode = AudioRolloffMode.Logarithmic;
-            src.Play();
-            UnityEngine.Object.Destroy(go, clip.length + 0.25f);
-        }
-        catch
-        {
-            AudioSource.PlayClipAtPoint(clip, pos, volume);
         }
     }
 
