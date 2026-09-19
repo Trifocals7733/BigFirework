@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://repository-images.githubusercontent.com/1377473973/87103e9f-fcd1-4d1f-84ff-74a29ca2ccb9" alt="BigFirework banner">
+</p>
+
 # 🎆 Big Firework
 
 [![License](https://img.shields.io/badge/license-MIT-green?style=flat-square)](LICENSE)
