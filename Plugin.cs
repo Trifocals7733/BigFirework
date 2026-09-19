@@ -13,7 +13,7 @@ public class Plugin : BasePlugin
 {
     public const string PLUGIN_GUID = "walker.bigfireworks";
     public const string PLUGIN_NAME = "Big Firework";
-    public const string PLUGIN_VERSION = "1.9.0";
+    public const string PLUGIN_VERSION = "1.0.0";
 
     internal static new ManualLogSource Log;
 
